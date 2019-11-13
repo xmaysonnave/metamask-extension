@@ -98,7 +98,6 @@ const getPublicConfigWhenReady = async () => {
   // if state is missing, wait for first update
   if (!state.networkVersion) {
     state = await new Promise(resolve => store.once('update', resolve))
-    console.log('new state', state)
   }
   return state
 }

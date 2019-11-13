@@ -69,7 +69,7 @@ export default class ConfirmTransactionBase extends Component {
     transactionStatus: PropTypes.string,
     txData: PropTypes.object,
     unapprovedTxCount: PropTypes.number,
-    currentNetworkUnapprovedTxs: PropTypes.object,
+    currentNetworkUnapprovedTxs: PropTypes.arrayOf(PropTypes.object),
     updateGasAndCalculate: PropTypes.func,
     customGas: PropTypes.object,
     // Component props
@@ -557,20 +557,25 @@ export default class ConfirmTransactionBase extends Component {
 
   getNavigateTxData () {
     const { currentNetworkUnapprovedTxs, txData: { id } = {} } = this.props
-    const enumUnapprovedTxs = Object.keys(currentNetworkUnapprovedTxs).reverse()
-    const currentPosition = enumUnapprovedTxs.indexOf(id ? id.toString() : '')
+    const currentPosition = currentNetworkUnapprovedTxs.indexOf(id ? id.toString() : '')
+    const nextTx = currentNetworkUnapprovedTxs[currentPosition + 1]
+    const prevTx = currentNetworkUnapprovedTxs[currentPosition - 1]
+    console.log('_foo current unapproved tx', currentNetworkUnapprovedTxs)
 
-    return {
-      totalTx: enumUnapprovedTxs.length,
+    // return {
+    const ret = {
+      totalTx: currentNetworkUnapprovedTxs.length,
       positionOfCurrentTx: currentPosition + 1,
-      nextTxId: enumUnapprovedTxs[currentPosition + 1],
-      prevTxId: enumUnapprovedTxs[currentPosition - 1],
-      showNavigation: enumUnapprovedTxs.length > 1,
-      firstTx: enumUnapprovedTxs[0],
-      lastTx: enumUnapprovedTxs[enumUnapprovedTxs.length - 1],
+      nextTxId: nextTx ? nextTx.id : '',
+      prevTxId: prevTx ? prevTx.id : '',
+      showNavigation: currentNetworkUnapprovedTxs.length > 1,
+      firstTx: currentNetworkUnapprovedTxs[0],
+      lastTx: currentNetworkUnapprovedTxs[currentNetworkUnapprovedTxs.length - 1],
       ofText: this.context.t('ofTextNofM'),
       requestsWaitingText: this.context.t('requestsAwaitingAcknowledgement'),
     }
+    console.log('_foo tx nav data', ret)
+    return ret
   }
 
   _beforeUnload = () => {

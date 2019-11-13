@@ -1,7 +1,6 @@
 import { connect } from 'react-redux'
 import { compose } from 'recompose'
 import { withRouter } from 'react-router-dom'
-import R from 'ramda'
 import contractMap from 'eth-contract-metadata'
 import ConfirmTransactionBase from './confirm-transaction-base.component'
 import {
@@ -72,7 +71,7 @@ const mapStateToProps = (state, ownProps) => {
     nonce,
   } = confirmTransaction
   const { txParams = {}, lastGasPrice, id: transactionId, transactionCategory } = txData
-  const transaction = R.find(({ id }) => id === (transactionId || Number(paramsTransactionId)))(selectedAddressTxList) || {}
+  const transaction = selectedAddressTxList.find(({ id }) => id === (transactionId || Number(paramsTransactionId))) || {}
   const {
     from: fromAddress,
     to: txParamsToAddress,
@@ -118,11 +117,10 @@ const mapStateToProps = (state, ownProps) => {
     txData.simulationFails = transaction.simulationFails
   }
 
-  const currentNetworkUnapprovedTxs = R.filter(
-    ({ metamaskNetworkId }) => metamaskNetworkId === network,
-    unapprovedTxs,
+  const currentNetworkUnapprovedTxs = Object.values(unapprovedTxs).filter(
+    ({ metamaskNetworkId }) => metamaskNetworkId === network
   )
-  const unapprovedTxCount = valuesFor(currentNetworkUnapprovedTxs).length
+  const unapprovedTxCount = currentNetworkUnapprovedTxs.length
 
   const insufficientBalance = !isBalanceSufficient({
     amount,

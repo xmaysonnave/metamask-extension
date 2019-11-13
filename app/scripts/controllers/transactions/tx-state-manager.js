@@ -129,6 +129,7 @@ class TransactionStateManager extends EventEmitter {
     if (txMeta.txParams) {
       txMeta.txParams = this.normalizeAndValidateTxParams(txMeta.txParams)
     }
+    console.log('_foo NEW TX', txMeta)
 
     this.once(`${txMeta.id}:signed`, function () {
       this.removeAllListeners(`${txMeta.id}:rejected`)
