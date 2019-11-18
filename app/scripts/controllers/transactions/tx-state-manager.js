@@ -129,7 +129,6 @@ class TransactionStateManager extends EventEmitter {
     if (txMeta.txParams) {
       txMeta.txParams = this.normalizeAndValidateTxParams(txMeta.txParams)
     }
-    console.log('_foo NEW TX', txMeta)
 
     this.once(`${txMeta.id}:signed`, function () {
       this.removeAllListeners(`${txMeta.id}:rejected`)
@@ -160,7 +159,12 @@ class TransactionStateManager extends EventEmitter {
         transactions.splice(index, 1)
       }
     }
-    transactions.push(txMeta)
+    const newTxIndex = transactions.findIndex((metaTx) => {
+      return metaTx.id === txMeta.id + 1
+    })
+    newTxIndex === -1
+      ? transactions.push(txMeta)
+      : transactions.splice(newTxIndex, 0, txMeta)
     this._saveTxList(transactions)
     return txMeta
   }

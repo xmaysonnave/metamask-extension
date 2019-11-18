@@ -193,12 +193,12 @@ class TransactionController extends EventEmitter {
     }
     txUtils.validateTxParams(normalizedTxParams)
     // construct txMeta
-    const { transactionCategory, getCodeResponse } = await this._determineTransactionCategory(txParams)
     let txMeta = this.txStateManager.generateTxMeta({
       txParams: normalizedTxParams,
       type: TRANSACTION_TYPE_STANDARD,
-      transactionCategory,
     })
+    const { transactionCategory, getCodeResponse } = await this._determineTransactionCategory(txParams)
+    txMeta.transactionCategory = transactionCategory
     this.addTx(txMeta)
     this.emit('newUnapprovedTx', txMeta)
 
@@ -221,6 +221,7 @@ class TransactionController extends EventEmitter {
 
     return txMeta
   }
+
   /**
   adds the tx gas defaults: gas && gasPrice
   @param txMeta {Object} - the txMeta object
