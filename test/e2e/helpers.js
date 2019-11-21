@@ -6,8 +6,10 @@ const assert = require('assert')
 
 const {
   delay,
+  getExtensionIdPuppeteer,
   getExtensionIdChrome,
   getExtensionIdFirefox,
+  buildPuppeteerDriver,
   buildChromeWebDriver,
   buildFirefoxWebdriver,
   installWebExt,
@@ -42,7 +44,13 @@ module.exports = {
 async function prepareExtensionForTesting ({ responsive } = {}) {
   let driver, extensionId, extensionUrl
   const targetBrowser = process.env.SELENIUM_BROWSER
+
   switch (targetBrowser) {
+    case 'puppeteer':
+      const extPath = path.resolve('dist/chrome')
+      driver = await buildPuppeteerDriver(extPath)
+      extensionId = await getExtensionIdPuppeteer(driver)
+      break
     case 'chrome': {
       const extPath = path.resolve('dist/chrome')
       driver = buildChromeWebDriver(extPath, { responsive })
@@ -69,14 +77,25 @@ async function prepareExtensionForTesting ({ responsive } = {}) {
   // are closing any extraneous windows to reset us to a single window before continuing.
 
   // wait an extra long time so any slow popups can trigger
-  await delay(4 * largeDelayMs)
 
-  const [tab1] = await driver.getAllWindowHandles()
-  await closeAllWindowHandlesExcept(driver, [tab1])
-  await driver.switchTo().window(tab1)
-  await driver.get(extensionUrl)
+  switch (targetBrowser) {
+    case 'puppeteer':
+      const pages = await driver.pages()
+      await pages[0].close()
+      await pages[1].close()
 
-  return { driver, extensionId, extensionUrl }
+      return { driver, extensionId }
+    case 'chrome':
+    case 'firefox':
+      await delay(4 * largeDelayMs)
+
+      const [tab1] = await driver.getAllWindowHandles()
+      await closeAllWindowHandlesExcept(driver, [tab1])
+      await driver.switchTo().window(tab1)
+      await driver.get(extensionUrl)
+
+      return { driver, extensionId, extensionUrl }
+  }
 }
 
 async function setupFetchMocking (driver) {

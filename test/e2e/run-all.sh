@@ -76,7 +76,7 @@ concurrently --kill-others \
   --success first \
   'yarn ganache:start' \
   'yarn dapp' \
-  'sleep 5 && mocha test/e2e/address-book.spec'
+  'sleep 5 && yarn e2e:puppet:chrome'
 
 export GANACHE_ARGS="${BASE_GANACHE_ARGS} --deterministic --account=0x53CB0AB5226EEBF4D872113D98332C1555DC304443BEE1CF759D15798D3C55A9,25000000000000000000"
 concurrently --kill-others \

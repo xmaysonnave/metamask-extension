@@ -1089,7 +1089,7 @@ describe('MetaMask', function () {
       await delay(regularDelayMs)
     })
 
-    it('finds the transaction in the transactions list', async function () {
+    xit('finds the transaction in the transactions list', async function () {
       await driver.wait(async () => {
         const confirmedTxes = await findElements(driver, By.css('.transaction-list__completed-transactions .transaction-list-item'))
         return confirmedTxes.length === 2

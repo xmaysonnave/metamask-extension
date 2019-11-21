@@ -5,10 +5,10 @@ const {
   delay,
 } = require('./func')
 const {
-  checkBrowserForConsoleErrors,
+  // checkBrowserForConsoleErrors,
   findElement,
   findElements,
-  verboseReportOnFailure,
+  // verboseReportOnFailure,
   setupFetchMocking,
   prepareExtensionForTesting,
 } = require('./helpers')
@@ -28,21 +28,24 @@ describe('MetaMask', function () {
   before(async function () {
     const result = await prepareExtensionForTesting()
     driver = result.driver
-    await setupFetchMocking(driver)
+    // await setupFetchMocking(driver) // TODO: Find alternative Puppeteer implementation
   })
 
   afterEach(async function () {
-    if (process.env.SELENIUM_BROWSER === 'chrome') {
-      const errors = await checkBrowserForConsoleErrors(driver)
-      if (errors.length) {
-        const errorReports = errors.map(err => err.message)
-        const errorMessage = `Errors found in browser console:\n${errorReports.join('\n')}`
-        console.error(new Error(errorMessage))
-      }
-    }
-    if (this.currentTest.state === 'failed') {
-      await verboseReportOnFailure(driver, this.currentTest)
-    }
+    // if (process.env.SELENIUM_BROWSER === 'chrome') {
+    //   const errors = await checkBrowserForConsoleErrors(driver)
+    //   if (errors.length) {
+    //     const errorReports = errors.map(err => err.message)
+    //     const errorMessage = `Errors found in browser console:\n${errorReports.join('\n')}`
+    //     console.error(new Error(errorMessage))
+    //   }
+    // }
+    // if (this.currentTest.state === 'failed') {
+    //   await verboseReportOnFailure(driver, this.currentTest)
+    // }
+
+    // TODO: checkBrowserForConsoleErrors find alternative to driver.manage().logs()
+    // https://github.com/GoogleChrome/puppeteer/blob/v1.20.0/docs/api.md#class-consolemessage
   })
 
   after(async function () {
