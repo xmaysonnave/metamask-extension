@@ -164,18 +164,39 @@ async function checkBrowserForConsoleErrors (driver) {
 }
 
 async function verboseReportOnFailure (driver, test) {
-  let artifactDir
-  if (process.env.SELENIUM_BROWSER === 'chrome') {
-    artifactDir = `./test-artifacts/chrome/${test.title}`
-  } else if (process.env.SELENIUM_BROWSER === 'firefox') {
-    artifactDir = `./test-artifacts/firefox/${test.title}`
-  }
+  let screenshot
+
+  const artifactDir = `./test-artifacts/${test.title}`
   const filepathBase = `${artifactDir}/test-failure`
   await pify(mkdirp)(artifactDir)
-  const screenshot = await driver.takeScreenshot()
-  await pify(fs.writeFile)(`${filepathBase}-screenshot.png`, screenshot, { encoding: 'base64' })
-  const htmlSource = await driver.getPageSource()
-  await pify(fs.writeFile)(`${filepathBase}-dom.html`, htmlSource)
+
+  switch (process.env.SELENIUM_BROWSER) {
+    case 'chrome':
+    case 'firefox':
+      screenshot = await driver.takeScreenshot()
+      break
+    case 'puppeteer':
+      screenshot = await driver.screenshot({ path: `${filepathBase}-screenshot.png`, fullPage: true })
+      await pify(fs.writeFile)(`${filepathBase}-screenshot.png`, screenshot, { encoding: 'base64' })
+      // const htmlSource = await driver.getPageSource()
+      // await pify(fs.writeFile)(`${filepathBase}-dom.html`, htmlSource)
+      // artifactDir = `./test-artifacts/${test.title}`
+      // const filepathBase = `${artifactDir}/test-failure`
+      break
+    default:
+      break
+  }
+  // if (process.env.SELENIUM_BROWSER === 'chrome') {
+  //   artifactDir = `./test-artifacts/chrome/${test.title}`
+  // } else if (process.env.SELENIUM_BROWSER === 'firefox') {
+  //   artifactDir = `./test-artifacts/firefox/${test.title}`
+  // }
+  // const filepathBase = `${artifactDir}/test-failure`
+  // await pify(mkdirp)(artifactDir)
+  // const screenshot = await driver.takeScreenshot()
+  // await pify(fs.writeFile)(`${filepathBase}-screenshot.png`, screenshot, { encoding: 'base64' })
+  // const htmlSource = await driver.getPageSource()
+  // await pify(fs.writeFile)(`${filepathBase}-dom.html`, htmlSource)
 }
 
 async function findElement (driver, by, timeout = 10000) {
